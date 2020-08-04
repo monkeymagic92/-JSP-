@@ -1,0 +1,122 @@
+﻿<% for(BoardVO vo : boardList) { %>
+		<tr>
+			<td><%=vo.getI_board() %></td>
+			<td><a href="/jsp/boardDetail.jsp?i_board=<%=vo.getI_board() %>">
+			<%=vo.getTitle() %></td>
+		</tr>
+		<% } %>
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<td><a href="/jsp/boardDetail.jsp?i_board=<%=vo.getI_board() %>">
+
+?i_board=<%=vo.getI_board() %>">
+
+? 뒤에 부분에서 i_board 는 실제 t_board 테이블에 i_board 컬럼으로 참조를 하겠다
+(foreign key 랑 비슷)
+
+왜 i_board를 했냐 PK값이 걸려있기 때문에 ..
+만약 콘텐츠(안에내용) 까지 다가져오면 너무 트래픽 낭비가 일어남
+여러 큰값을 가져오는게 아니라 그냥 간단한 단추만 받아오면됨
+
+그 단추값은 boardDetail.jsp 코드내용중 
+
+String strI_board = request.getParameter("i_board");
+
+겟파라미터로 받아온 i_board 값은 strI_board에 넣겠다 란 뜻 
+
+
+
+콘텐츠 내용은 boardDetail 에서 뿌려주기만 하면됨 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+
+
+
+여기서 ? 는 map(key,value)값 키값만 알면 value값을 알수있다
+그리도 또한 i_board 에 프라이머리키가 잡혀있으니 다른쪽에서는 중복되는 값이 나올수있으니
+
+
+
+쿼리 스트링 : ?i_board=<%=vo.getI_board() %>"> i_board 키값을 쓰면 vo.geti_board()로 넘어감
+? 로 시작하는게 쿼리스트링 시작지점
+
+
+
+네이버에 검색창에서 쿼리스트링이 주소창에 뜨는것을 get 방식이라고 함 = 속도유리
+- 누구한테 노출되도 상관없다 (페이지검색할때나 이럴때)
+
+
+네이버에 검색창에서 쿼리스트링이 주소창에 뜨는것을 host 방식이라고 함 = 보안유리
+- 아이디 비번 같은 개인정보를 할때 사용
+- 캡슐화해서 뒤에 쿼리스트링 값은 안보임 
+
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+에러 내용 (콘솔창)
+
+부적합한 열이름 : String sql = " SELECT job_id, table from table " 이런곳에서 쿼리문에
+컬럼값이 빠졌거나 쿼리문을 잘못입력했을 경우 
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+finally {
+		// 열었으면 꼭 닫아줘야됨 위에서 con,ps,rs 열었으면 닫을때는 rs,ps,con 순으로 위에서 밑으로 -> 밑에서 위로
+		// 따로따로 try catch를 한이유는 rs에서 에러가 뜨더라도, ps에서 닫아주고  또한 ps가 에러뜨더라도 con은 닫아줘야되니
+		if(rs != null) {try {rs.close();} catch(Exception e) {} } // SELECT 사용할때 필요
+		if(ps != null) {try {ps.close();} catch(Exception e) {} }
+		if(con != null) {try {con.close();} catch(Exception e) {} }
+	}
+
+
+HTTP 서버는 한번 네이버창을 띄워주면 다시 인터넷선을 뽑는다해도 유지됨
+왜냐 ? 보내주고 바로 연결을 끊어버림 즉, 인터넷창에서 다시 다른걸 검색하면
+다시 보내주고 연결끊김  
+
+!!!!!!! 항상 무조건 열었으면 닫아주는 finally 값을 주자 !!!!!!!!!!!
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+String strI_board = request.getParameter("title");
+
+- request 가 모든 ip 뭐 이런정보 다 담겨있음  (쿼리스트링은 getParameter 로받음 )
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+String sql = " SELECT i_board, title, ctnt,  i_student "
+ 			+ "FROM t_board where i_board = ? ";
+
+여기서 ? 는 포맷팅메소드 %d %d 이런거랑 같음
+
+즉 ps.setInt(1,5) 하면  첫번째 무름표에 5가들어가고
+  ps.getNString(3,"d") 하면  3번째 무름표에 d가 들어감 
+
+PrepareStatement 클래스에 있는  getNString() 메소드나 getInt() 메소드 사용
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+rs = ps.executeQuery(); // executeQuery() 실행하는 메소드(DB에서 컨트롤 엔터 누르는거 같은효과) 
+
+
+//BoardVO 객체를 만들어서 셋터로 값뽑는방법
+//BoardVo vo 객체를 if문 안에서 선언해줬음
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+자바(JSP)에서 DB로 보내는 명령어들은 자동 커밋 됨
+왜냐 ? 이클립스에서 오토 커밋이 켜져있기 때문
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+에러내용 : 인덱스에서 누락된 IN 또는 OUT 매개변수:: 1
+ps.setInt(1,result); <-- sql문에 무름표 에 값 안넣어줘서 뜨는 에러 
+
+
+
+
+

@@ -1,0 +1,75 @@
+﻿== boardWrite.jsp 페이지 내용 ==
+
+- html 부분 -
+<form id="frm" action="/jsp/boardWriteProc.jsp" method="post" onsubmit="return chk()">
+
+↑ 위 코드와     ↓ 밑에코드 서로 이어짐
+
+
+form id="frm"     &    onsubmit="return chk()">  두개 유심히보기 
+
+<script>
+		function chk() {
+			console.log(`title : \${frm.title.value}`);  // form 태그에 id="frm" 을줬음  즉 아이디값을 주면 바로 자바스크립트에서 객체화로 사용가능
+			//console.log("title : " + frm.title.value);										 // 자바스크립트에서는 ${frm.title.value} 해도되지만  JSP에서는 \$ 해줘야됨  왜냐 ? jsp에서도 $표시를 사용하여 중첩되기 때문에 구분용
+			if (frm.title.value == '') {
+				alert("제목을 입력해 주세요");
+				frm.title.focus();
+				return false;
+			} else if (frm.ctnt.value.length == 0) {
+				alert("내용을 입력해 주세요");
+				frm.ctnt.focus()    // 마우스 커서를 여기다가 주겠다
+				return false;
+			} else {
+				alert("작성자를 입력해주세요")
+				frm.i_student.focus()
+				return false;
+			}
+			
+		}
+</script>
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+== boardWritePro.jsp == 
+
+if(err != null) {
+		switch(err) {
+		case "10":
+			msg="등록할수 없습니다";
+			break;
+			
+		case "20":
+			msg ="DB 에러 발생";
+			break;
+		}
+}
+
+↑ 위 코드와     ↓ 밑에코드 서로 이어짐
+
+
+== boardWrite.jsp ==
+
+int err = 0;
+switch(result) {
+	case 1:
+		response.sendRedirect("/jsp/boardList.jsp"); // 자바에서 원하는 페이지이동   =  <a href=  >, location href 랑 같음
+		return; // return : 은 메소드자체를 종료한다 ( 즉 서블릿메소드를 종료시킨다는 뜻)
+		
+	case 0:
+		err = 10;
+		break; // break; : switch문을 종료함
+		
+	case -1:
+		err = 20;
+		break;
+	}
+	
+	response.sendRedirect("/jsp/boardWrite.jsp?err=" + err); 
+
+
+
+
+

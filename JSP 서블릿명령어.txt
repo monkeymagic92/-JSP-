@@ -1,0 +1,246 @@
+﻿
+
+			      == JSP 서블릿 명령어 ==
+
+
+
+
+- 서블릿이란 : HTTP 클래스를 상속받은 클래스
+
+<%!
+	// 서블릿 클래스의 멤버필드(전역변수) 로 빼겟다는 뜻
+	// 메소드 생성가능, private 등.. (우리 일반 클래스파일이랑 같음)
+%>
+
+<%
+	// 서블릿 클래스 안 메소드안에 속해있다고 보면됨
+	// 즉, System.out.println() <-- 이런 메소드안에서 우리가 작성한다 보면됨 
+%>
+
+<%@ ... %>	// 임포트 명령어 (셋팅) 다른패키지에 있는 것을 사용하고자할때 
+
+<%=  .. %>  	// 자바로 찍어내기 위한 것들을 작성할때 사용하는것
+
+
+
+<%@ page import="java.sql.*" %> 	// sql 언어를 사용하기 위한 임포트명령
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+- 라이프 싸이클 -
+
+pageContext - JSP파일 생성하면 켜지고 JSP파일 끄면 죽는다
+
+리케스트 - 요청이 끝나면 죽는다
+
+session - 브라우저를 끄면 죽는다 (장시간 가만히있으면 죽긴함)
+(유저1 들어옴 - 유저1을 위한 세션 생성)
+(유저2 들어옴 - 유저2를 위한 세션 생성)
+.
+.
+(브라우저 끄면 죽음)
+여기까지 개인용
+
+application - 서버킴 생성되고 서버끄면 죽는다 (고객이 몇명이든 서버 1개만 만들어짐) (관리자용)
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+★ 집에서 알아보기 ★
+
+Class.forName("oracle.jdbc.driver.OracleDriver");
+
+Connection con = DriverManager.getConnection(url,username,password);
+
+e.printStackTrace();   -> 어떤에러가 뜨는지 알려줌
+
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+JSP는 상단에 저 코드가 필수적으로 있어야됨 
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+
+
+ == JSP 쿼리문 == 
+
+
+<%
+	// Connection, Prepared.. , Result --> 다 인터페이스들임 (대문자로 시작하면 다 클래스)
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;		//SELECT 문 사용할때 필요한 클래스 
+	
+	String sql = "SELECT i_board, title "
+			+ " FROM t_board";           // 가독성으로 인해 한줄띄우고
+						// title에서 한칸띄움 (문법에러안뜨게)
+
+	FROM t_board 제일마지막에 ; <-- 찍으면안됨 해킹당함 인젝션공격당함
+	sql디벨로퍼는 ; 찍지만 jsp 에서는 찍지말자
+	그리고 또한 세미콜론 찍어도 이미 jsp에서 실행안되게 막음, 애초에 ; 찍지말자
+%>
+
+
+Connection con = null      -> JSP -> DB 연결담당, 객체만들어주기
+
+PreparedStatement ps = null     -> 쿼리문 실행 담당( 실제 ★ 친 저 문구를 사용하기위해 ...)
+
+ResultSet rs = null;       ->   select때만! 결과를 담는 담당         // select를 제외하면 위에2개만 사용함
+
+
+
+★ PreparedStatement 를 사용하여
+String sql = " SELECT i_board, title "
+			+ " FROM t_board ";
+
+
+
+List<BoardVO> boardList = new ArrayList();  // 한개이상의 값을 가져오기위해선 무조건 리스트 만들어야됨
+
+Connection con = DriverManager.getConnection(url,username,password);
+// getConnection 메소드는 static 메소드임 왜냐? DriverManager 를 객체화하지않고
+// 바로 클래스명. 메소드를 적었기에
+// getConnection 은 쿼리문과 연결하는 연결선이라고 보면됨 ( 위에도 연결담당이라고 적어놓음)
+
+// static 메소드의 장점 : 클래스를 객체화 하지않아도 되며 속도가빠름
+
+
+
+// SELECT 문을 사용할때 예외처리 하는법 
+rs = ps.executeQuery();  --> 무조건 select할시에는 이거해줘야됨 
+
+try {
+		con = getCon();
+		ps = con.prepareStatement(sql);
+		rs = ps.executeQuery();   
+
+		while(rs.next()) {
+			int i_board = rs.getInt("i_board");
+			String title = rs.getString("title"); // rs.getString() 또는 rs.getNString() 둘다같음
+			
+			BoardVO vo = new BoardVO();
+			vo.setI_board(i_board);
+			vo.setTitle(title);
+			
+			boardList.add(vo);
+		}
+		
+	} catch(Exception e) {
+		e.printStackTrace();	  // 에러가 뭔지 알려주는 메소드 (안찍으면 뭐때문에 에러가 뜬지모름)
+		
+	} finally {
+		// 열었으면 꼭 닫아줘야됨 위에서 con,ps,rs 열었으면 닫을때는 rs,ps,con 순으로 위에서 밑으로 -> 밑에서 위로
+		// rs에서 에러터지면 밑에 실행이안되고 바로 catch로 가기때문에 나머지 밑에꺼는 실행이 안됨
+		// 따로따로 try catch를 한이유는 rs에서 에러가 뜨더라도, ps에서 닫아주고  또한 ps가 에러뜨더라도 con은 닫아줘야되니
+		if(rs != null) {try {rs.close();} catch(Exception e) {} } // 반복문 다돌고 rs에 값이 들어있으니 rs.close()를 하라 (닫아줘야
+		if(ps != null) {try {ps.close();} catch(Exception e) {} }
+		if(con != null) {try {con.close();} catch(Exception e) {} }
+	}
+
+
+
+파싱 : 사용하기 편하게 정리한다는 것
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+Project Exploer 뷰단에서..
+
+
+1. Java Resources ( 프로젝트 익스플로러 ) -> src 밑에 -> com.koreait.web 패키지 만들고 -> BoardVO 클래스 만들고..
+
+2. BoardVO 클래스안에 실제 데이터베이스 hr계정안에 t_board테이블 값들을 빼올
+private형 문자,정수 타입 변수를 만들고, private이니 get,set 메소드를 만듬
+
+
+3. 다시 boardList JSP파일로 돌아와 List를 써야되니    <%@ page import="java.util.*" %>,
+BoardVO 클래스까지 불러올수있는    <%@ page import="com.koreait.web.BoardVO" %>
+임포트 해주고 ArrayList()를 만듬
+
+
+
+
+
+★
+while(rs.next()) {
+			int i_board = rs.getInt("i_board");
+			String title = rs.getNString("title");
+			BoardVO vo = new BoardVO();
+			vo.setI_board(i_board);
+			vo.setTitle(title);
+			
+			boardList.add(vo);
+			
+		}
+rs.next() : 데이터베이스 레코드행을 가리키는데 그줄이 있으면 true를 없으면 false를 반환하는 메소드
+1 어쩌고,1
+2 어저고,2
+3 어러고,3
+
+이렇게있으면 3번 줄까지 가르키고 4번줄이 없으니 반복문 종료
+
+
+
+4. while(rs.next()) <-- next는 마우스커서라 생각하면 된다   next() 메소드의 리턴타입 : Boolean
+while문 시작했을대 데이터베이스 t_baord 레코드 1행을 가리킨다
+한줄,한줄 true를 리턴하고 마지막줄에서 더 추가하려면 t_board에 레코드가 없기에 faluse를 반환하고
+반복문 종료
+
+(while - 여러줄 가져오기,  if(rs.next){ } - 한줄가져오기)
+
+
+int i_board = rs.getInt("i_board");   // 실제 t_board 테이블 i_board 값이 '정수'니 '정수'형으로 받아오는 방법
+String title = rs.getNString("title"); // 실제 t_board 테이블 i_board 값이 '문자열'이니 '문자열'으로 받아오는 방법
+
+
+vo.setI_board(i_board);
+vo.setTitle(title);             // boardList 리스트안에 i_board,title 값 2개를 한칸에 넣음
+
+boardList.add(vo)   <-- 위 2개의 값을 boardList 리스트안에 한칸씩 넣음
+
+-- 이러한 작업을 파싱이라고 한다 --
+
+
+
+
+-- 실제 테이블을 만들어서 값이 나오도록 하는것 --
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>게시판</title>
+</head>
+<style>
+        table { width: 300px; border: 1px solid black; border-collapse: collapse;}
+        td { border: 1px solid black; text-align:center;}
+        tr { height: 60px;}
+</style>
+<body>
+	<div>게시판 리스트</div>	
+	<table>
+		<tr>
+			<th>No</th>
+			<th>제목</th>
+		</tr>
+		
+		<% for(BoardVO vo : boardList) { %>         // html ,tr코드 사용하기위해 {} 이거 <%> 나눠서씀
+		<tr>
+			<td><%=vo.getI_board() %></td>
+			<td><%=vo.getTitle() %></td>
+		</tr>
+		<% } %>
+	</table>
+	
+</body>
+</html>
+
+

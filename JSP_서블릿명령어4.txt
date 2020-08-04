@@ -1,0 +1,11 @@
+﻿<input type="hidden" name="i_board" value="<%=strI_board %>">
+- 인풋타입을 hidden으로 하면 url 주소창에 가려서 값을 보냄
+- 받는 페이지에서 request.getParameter("i_board") 해주면됨
+
+
+<form action="/jsp/boardUpdate.jsp?i_board=<%=strI_board %>" method="post">
+
+<a href="/jsp/boardUpdate.jsp?i_board="<%=strI_board%>클릭</a>
+
+
+
